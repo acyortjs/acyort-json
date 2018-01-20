@@ -1,7 +1,15 @@
 const _ = require('lodash')
+const pathFn = require('path')
 
-function json(data) {
-  const { config } = this
+function jsonify(data) {
+  const { config, logger, fs } = this
+  const { json, public_dir: publicDir, base } = config
+
+  if (json === undefined) {
+    return data
+  }
+
+  const { path = 'json' } = json
   const {
     posts,
     pages,
@@ -23,6 +31,11 @@ function json(data) {
       return post
     }
     return ''
+  }
+
+  function output(jsonPath, jsonData) {
+    fs.outputFileSync(pathFn.join(base, publicDir, path, jsonPath), JSON.stringify(jsonData))
+    logger.success(jsonPath)
   }
 
   result.config = Object.assign(_.omit(config, ['token', 'base', 'cache']), {
@@ -72,6 +85,24 @@ function json(data) {
       posts: page.posts.map(id => getPostById(id)),
     }))
   })
+
+  output('config.json', result.config)
+  result.pages.forEach(p => output(`pages/${p.id}.json`, p))
+  result.posts.forEach(p => output(`posts/${p.id}.json`, p))
+  result.index.forEach((p, i) => output(`page/${i + 1}.json`, p))
+
+  Object.keys(result.categories).forEach((c) => {
+    const current = result.categories[c]
+    const dir = `categories/${current[0].id}`
+    current.forEach((p, i) => output(`${dir}/${i + 1}.json`, p))
+  })
+  Object.keys(result.tags).forEach((t) => {
+    const current = result.tags[t]
+    const dir = `tags/${current[0].id}`
+    current.forEach((p, i) => output(`${dir}/${i + 1}.json`, p))
+  })
+
+  return data
 }
 
-module.exports = json
+module.exports = jsonify

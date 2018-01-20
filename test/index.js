@@ -9,6 +9,7 @@ config.cache =  true
 config.scripts = ['builder.js']
 config.scripts_dir = '/'
 config.per_page = 2
+config.json = { path: 'json' }
 
 const acyort = new Acyort(config)
 
