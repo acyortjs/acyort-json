@@ -5,11 +5,11 @@ function jsonify(data) {
   const { config, logger, fs } = this
   const { json, public_dir: publicDir, base } = config
 
-  if (json === undefined) {
+  if (!json) {
     return data
   }
 
-  const { path = 'json' } = json
+  const path = json.path || 'json'
   const {
     posts,
     pages,
@@ -62,7 +62,7 @@ function jsonify(data) {
     return post
   })
 
-  result.pages = pages.map(page => _.omit(page, ['path', 'url', 'raw']))
+  result.pages = pages.map(page => _.omit(page, ['path', 'raw']))
 
   result.index = index.map(page => page.posts.map(id => getPostById(id)))
 
