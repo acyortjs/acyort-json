@@ -4,6 +4,9 @@
   "env": {
     "node": true
   },
+  "globals": {
+    "acyort": true
+  },
   "rules": {
     "semi": [2, "never"]
   }
