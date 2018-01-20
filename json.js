@@ -25,18 +25,18 @@ function json(data) {
     return ''
   }
 
-  result.config = Object.assign(_.omit(config, ['token']), {
+  result.config = Object.assign(_.omit(config, ['token', 'base', 'cache']), {
     posts: posts.map(post => post.id),
-    pages: pages.map(page => _.pick(page, ['id', 'name'])),
-    tags: Object.keys(tags).map(id => ({
-      id,
-      name: tags[id][0].name,
-      count: tags[id].reduce((prev, item) => prev + item.posts.length, 0),
+    pages: pages.map(page => _.pick(page, ['id', 'url'])),
+    tags: tags.map(item => ({
+      id: item.id,
+      name: item.name,
+      count: item.posts.length,
     })),
-    categories: Object.keys(categories).map(id => ({
-      id,
-      name: categories[id][0].name,
-      count: categories[id].reduce((prev, item) => prev + item.posts.length, 0),
+    categories: categories.map(item => ({
+      id: item.id,
+      name: item.name,
+      count: item.posts.length,
     })),
   })
 
@@ -54,22 +54,24 @@ function json(data) {
   result.index = index.map(page => page.posts.map(id => getPostById(id)))
 
   Object.keys(category).forEach((key) => {
-    result.categorie[key] = category[key].map(page => ({
-      id: page.id,
+    result.categories[key] = category[key].map(page => ({
+      id: +page.base.split('/').slice(-1),
       title: page.title,
+      current: page.current,
+      total: page.total,
       posts: page.posts.map(id => getPostById(id)),
     }))
   })
 
   Object.keys(tag).forEach((key) => {
     result.tags[key] = tag[key].map(page => ({
-      id: page.base.split('/').slice(-1),
+      id: +page.base.split('/').slice(-1),
       title: page.title,
+      current: page.current,
+      total: page.total,
       posts: page.posts.map(id => getPostById(id)),
     }))
   })
-
-  console.log(result)
 }
 
 module.exports = json
