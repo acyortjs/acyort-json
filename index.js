@@ -1,1 +1,1 @@
-acyort.extend.register('after_build', require('./json').bind(acyort))
+acyort.filter.register('after_build', require('./json').bind(acyort))
